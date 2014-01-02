@@ -92,10 +92,9 @@ package
 			addChild(scroller);
 
 			GameAnalytics.init(SECRET_KEY, GAME_KEY, GAME_VERSION);
-			GameAnalytics.getLogEvents(onLogEvent);
 			GameAnalytics.DEBUG_MODE = true;
-
-			//GameAnalytics.deleteAllEvents();
+			GameAnalytics.getLogEvents(onLogEvent);
+			GameAnalytics.catchUnhandledExceptions(loaderInfo, true);
 
 			showUserInfo();
 		}
