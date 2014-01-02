@@ -4,6 +4,7 @@ package com.gameanalytics
 	import com.gameanalytics.utils.GADeviceUtil;
 	import com.gameanalytics.utils.GADeviceUtilMobile;
 
+	import flash.display.LoaderInfo;
 	import flash.events.EventDispatcher;
 
 	public class GameAnalyticsMobile extends EventDispatcher
@@ -118,6 +119,48 @@ package com.gameanalytics
 			core.deleteAllEvents();
 		}
 
+		/**
+		 * If the DEBUG_MODE is set to true, you can listen for the log events that are dispatched by the SDK (basically, they contain the same text that you see in the traces).
+		 * This can be useful if device debugging is not available on your device and you want to output the debugging info in your own debug window.
+		 *
+		 * Your callBack function should have a GALogEvent as parameter, similar to this:
+		 *
+		 * private function onLogEvent(e:GALogEvent):void
+		 * {
+		 *	 	trace(e.text);
+		 * }
+		 *
+		 * @param callBackFunction:Function - your function that will receive the GALogEvent
+		 */
+		public static function getLogEvents(callBackFunction:Function):void
+		{
+			core.addEventListener(GALogEvent.LOG, callBackFunction);
+		}
+
+		/**
+		 * You can automatically catch any unhandled exceptions and send them as Error events to the GameAnalytics. Optionally, you can surpress the exceptions from appearing in the Flash player
+		 *
+		 * NOTE: Please be careful with the exceptions surpressing since you will not see any runtime errors anymore
+		 *
+		 * @param loaderInfo:LoaderInfo - the loaderInfo from your main application class
+		 * @param surpressExceptions:Boolean - wheter the exceptions should be surpressed or not
+		 */
+		public static function catchUnhandledExceptions(loaderInfo:LoaderInfo, surpressExceptions:Boolean):void
+		{
+			core.catchUnhandledExceptions(loaderInfo, surpressExceptions);
+		}
+
+		/**
+		 * Destroys everything for a clean garbage collection. No need to call this unless you are using the GameAnalytics in some subloaded modules and want to get the GameAnalytics to be garbage collected properly.
+		 * This will also delete all currently queued events.
+		 *
+		 * You still can re-initialize the GameAnalytics at a later point and use it again.
+		 */
+		public function destroy():void
+		{
+			core.destroy();
+		}
+
 		////////////////////////////
 		//
 		//	GETTERS
@@ -140,6 +183,9 @@ package com.gameanalytics
 			return core.getVersion();
 		}
 
+		/**
+		 * Returns the current user id
+		 */
 		public static function getUserId():String
 		{
 			return core.getUserId();
@@ -153,11 +199,6 @@ package com.gameanalytics
 		public static function isInitialized():Boolean
 		{
 			return core.isInitialized();
-		}
-
-		public static function getLogEvents(callBackFunction:Function):void
-		{
-			core.addEventListener(GALogEvent.LOG, callBackFunction);
 		}
 
 		////////////////////////////

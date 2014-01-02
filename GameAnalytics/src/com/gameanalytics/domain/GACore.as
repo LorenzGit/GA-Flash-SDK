@@ -8,12 +8,14 @@ package com.gameanalytics.domain
 	import com.gameanalytics.utils.GAUniqueIdUtil;
 	import com.gameanalytics.utils.IGADeviceUtil;
 
+	import flash.display.LoaderInfo;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.events.TimerEvent;
+	import flash.events.UncaughtErrorEvent;
 	import flash.net.SharedObject;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -29,12 +31,17 @@ package com.gameanalytics.domain
 		// private
 		private const API_URL:String = "http://api.gameanalytics.com"; // The API base URL
 		private const API_VERSION:String = "1"; // API version
-		private const SDK_VERSION:String = "GA SDK FLASH 1.0.0"; // GameAnalytics SDK version
+		private const SDK_VERSION:String = "GA SDK FLASH 2.0.0"; // GameAnalytics SDK version
+		private const EVENT_LIMIT_PER_TYPE:int = 100; // if any type of events in the queue are over this limit, the SDK will drop the oldest events
 
 		private const DATA_SEND_INTERVAL:int = 5000; // Interval for sending data to server (in milliseconds)
 
 		private var debugMode:Boolean;
 		private var initialized:Boolean;
+
+		private var surpressExceptions:Boolean;
+		private var unhandledExceptionsLoaderInfo:LoaderInfo;
+
 		private var secretKey:String;
 		private var gameKey:String;
 		private var gameBuild:String;
@@ -209,7 +216,7 @@ package com.gameanalytics.domain
 				if (gender == "M" || gender == "F")
 					object.gender = gender;
 				else
-					throwError('ERROR: newUserEvent - gender can only have values "M" or "F"')
+					log('ERROR: newUserEvent - gender can only have values "M" or "F". This property will be ignored.')
 			}
 
 			if (!isNaN(birthYear))
@@ -256,7 +263,7 @@ package com.gameanalytics.domain
 		 *
 		 * @param eventId:String - Your type of an event (for example, "Wrong username" or "Wrong password")
 		 * @param message:String - The message that is associated with this error
-		 * @param severity:String - Error severity. Please use the constants in the ErrorSeverity class - for example ErrorSeverity.CRITICAL
+		 * @param severity:String - Error severity. Please use the constants in the GAErrorSeverity class - for example GAErrorSeverity.CRITICAL
 		 * @param x:Number (optional) - The x coordinate of this event
 		 * @param y:Number (optional) - The y coordinate of this event
 		 * @param z:Number (optional) - The z coordinate of this event
@@ -267,7 +274,29 @@ package com.gameanalytics.domain
 			if (severity == GAErrorSeverity.CRITICAL || severity == GAErrorSeverity.DEBUG || severity == GAErrorSeverity.ERROR || severity == GAErrorSeverity.INFO || severity == GAErrorSeverity.WARNING)
 				addEventToQueue(GAEventConstants.ERROR, addOptionalParameters({user_id: userId, session_id: sessionId, build: gameBuild, event_id: eventId, message: message, severity: severity}, null, x, y, z));
 			else
-				throwError("newErrorEvent: " + severity + " is not a valid error severity. Please use the ErrorSeverity constants for the types - for example, ErrorSeverity.ERROR");
+				log("ERROR newErrorEvent: " + severity + " is not a valid error severity. Please use the GAErrorSeverity constants for the types - for example, GAErrorSeverity.ERROR. Current value will be replaced with GAErrorSeverity.ERROR");
+		}
+
+		/**
+		 * You can automatically catch any unhandled exceptions and send them as Error events to the GameAnalytics. Optionally, you can surpress the exceptions from appearing in the Flash player
+		 *
+		 * NOTE: Please be careful with the exceptions surpressing since you will not see any runtime errors anymore
+		 *
+		 * @param loaderInfo:LoaderInfo - the loaderInfo from your main application class
+		 * @param surpressExceptions:Boolean - wheter the exceptions should be surpressed or not
+		 */
+		public function catchUnhandledExceptions(loaderInfo:LoaderInfo, surpressExceptions:Boolean):void
+		{
+			if (!loaderInfo)
+			{
+				log("catchUnhandledExceptions - the loaderInfo can not be null. No exceptions will be catched");
+			}
+			else
+			{
+				loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUnhandledException);
+				unhandledExceptionsLoaderInfo = loaderInfo;
+				this.surpressExceptions = surpressExceptions;
+			}
 		}
 
 		/**
@@ -358,9 +387,29 @@ package com.gameanalytics.domain
 			}
 		}
 
+		/**
+		 * Returns the current debug mode
+		 */
 		public function get DEBUG_MODE():Boolean
 		{
 			return debugMode;
+		}
+
+		/**
+		 * Destroys everything for a clean garbage collection. No need to call this unless you are using the GameAnalytics in some subloaded modules and want to get the GameAnalytics to be garbage collected properly.
+		 * This will also delete all currently queued events.
+		 *
+		 * You still can re-initialize the GameAnalytics at a later point and use it again.
+		 */
+		public function destroy():void
+		{
+			dataSendTimer.removeEventListener(TimerEvent.TIMER, onDataSendTimer);
+			dataSendTimer.stop();
+
+			if (unhandledExceptionsLoaderInfo)
+				unhandledExceptionsLoaderInfo.uncaughtErrorEvents.removeEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onUnhandledException);
+
+			deleteAllEvents();
 		}
 
 		////////////////////////////
@@ -383,6 +432,10 @@ package com.gameanalytics.domain
 				log(type + " event added to queue: " + JSON.stringify(data));
 
 				eventQueue[type].push(data);
+
+				// check limits and drop first events from the queue if we are over it
+				if (eventQueue[type].length > EVENT_LIMIT_PER_TYPE)
+					eventQueue[type].shift();
 
 				if (!RUN_IN_EDITOR_MODE)
 				{
@@ -491,6 +544,9 @@ package com.gameanalytics.domain
 			return eventsQueue;
 		}
 
+		/**
+		 * Creates a new events queue array
+		 */
 		private function createNewEventsQueue():Array
 		{
 			var array:Array = [];
@@ -516,8 +572,8 @@ package com.gameanalytics.domain
 		 */
 		private function throwError(message:String):void
 		{
-			log("GameAnalytics Error: " + message);
-			throw new Error(message);
+			log(message);
+			throw new Error("GA SDK " + message);
 		}
 
 		/**
@@ -527,11 +583,14 @@ package com.gameanalytics.domain
 		{
 			if (debugMode)
 			{
+				// trace the message and fire a log event
 				trace("GA SDK " + message);
 				dispatchEvent(new GALogEvent(GALogEvent.LOG, message));
 			}
 			else
 			{
+				// if debug is disabled, we still store the last 10 debug messages that are displayed when debug will be set to true.
+				// primarily this is used to catch up the very first debug messages when the SDK is initialized but the debug mode is not set to true yet
 				debugArray.push(message);
 
 				if (debugArray.length == 11)
@@ -540,6 +599,9 @@ package com.gameanalytics.domain
 
 		}
 
+		/**
+		 * Stores the event queue in the local shared object if it is available
+		 */
 		private function writeEventQueueToLocalSharedObject(array:Array):void
 		{
 			if (sharedObject)
@@ -549,32 +611,62 @@ package com.gameanalytics.domain
 			}
 		}
 
+		/**
+		 * Removes event listeners from URLLoader after getting the server response
+		 */
+		private function removeEventListenersFromLoader(loader:URLLoader):void
+		{
+			loader.removeEventListener(Event.COMPLETE, onRequestComplete);
+			loader.removeEventListener(IOErrorEvent.IO_ERROR, onRequestError);
+			loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onRequestSecurityError);
+			loader.removeEventListener(HTTPStatusEvent.HTTP_STATUS, onRequestStatus);
+		}
+
 		////////////////////////////
 		//
 		//	CALLBACKS
 		//
 		////////////////////////////
 
+		/**
+		 * Callback for the "Send events" timer that will force the sending of all data to the server
+		 */
 		private function onDataSendTimer(e:TimerEvent):void
 		{
 			sendData();
 		}
 
+		/**
+		 * Callback for the successfull server response. We are handling the responses in the onRequestStatus method
+		 */
 		private function onRequestComplete(event:Event):void
 		{
-			//log("Game Analytics Request Complete: " + event.target.data);
 		}
 
+		/**
+		 * Callback for an unsuccessfull server response. Usually in this case it means there is no internet connection available or the URL is wrong.
+		 * The events are kept in the queue and will be sent to the server on the next update.
+		 */
 		private function onRequestError(error:IOErrorEvent):void
 		{
 			log("ERROR - There was an error with the Game Analytics Server. " + error.text);
+			removeEventListenersFromLoader(error.currentTarget as URLLoader);
 		}
 
+		/**
+		 * Callback for an unsuccessfull server response when there is some security related errors.
+		 * The events are kept in the queue and will be sent to the server on the next update.
+		 */
 		private function onRequestSecurityError(error:SecurityErrorEvent):void
 		{
 			log("ERROR - There was an error with the Game Analytics Server. " + error.text);
+			removeEventListenersFromLoader(error.currentTarget as URLLoader);
 		}
 
+		/**
+		 * Callback for a server response when we get back the server response code.
+		 * The events are removed from the queue - if everything was fine, the events were sent to the server successfully. If not, it is most probably because the event was malformed or the URL was wrong (for example, due to the wrong game id), so there is no need to try and resend the event at a later point
+		 */
 		private function onRequestStatus(event:HTTPStatusEvent):void
 		{
 			switch (event.status)
@@ -582,37 +674,61 @@ package com.gameanalytics.domain
 				case 200:
 					// everything seem to be fine
 					log(event.currentTarget.data + " event(s) were sent successfully.");
-					resetQueue(event.currentTarget.data);
 					break;
 
 				case 400:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). Most likely this is because of an incorrect secret key, game id or corrupt JSON data");
+					log("ERROR 400 while sending " + event.currentTarget.data + " event(s). Most likely this is because of an incorrect secret key, game id or corrupt JSON data");
 					break;
 
 				case 401:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). Most likely this is because of an incorrect secret key, game id or the value of the authorization header is not valid or missing");
+					log("ERROR 401 while sending " + event.currentTarget.data + " event(s). Most likely this is because of an incorrect secret key, game id or the value of the authorization header is not valid or missing");
 					break;
 
 				case 403:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). The url is invalid");
+					log("ERROR 403 while sending " + event.currentTarget.data + " event(s). The url is invalid");
 					break;
 
 				case 404:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). Most likely the secret key or the game id are incorrect or there is a problem with the API call");
+					log("ERROR 404 while sending " + event.currentTarget.data + " event(s). Most likely the secret key or the game id are incorrect or there is a problem with the API call");
 					break;
 
 				case 500:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). Internal server error");
+					log("ERROR 500 while sending " + event.currentTarget.data + " event(s). Internal server error");
 					break;
 
 				case 501:
-					log("ERROR while sending " + event.currentTarget.data + " event(s). The used HTTP method is not supported.");
+					log("ERROR 501 while sending " + event.currentTarget.data + " event(s). The used HTTP method is not supported.");
 					break;
 
 				default:
 					log("ERROR while sending " + event.currentTarget.data + " event(s). Unknown error with the response code of " + event.status);
+					break;
 			}
 
+			resetQueue(event.currentTarget.data);
+			removeEventListenersFromLoader(event.currentTarget as URLLoader);
+		}
+
+		/**
+		 * Callback for caught unhandled exceptions in the application
+		 */
+		private function onUnhandledException(e:UncaughtErrorEvent):void
+		{
+			// only surpress the exception popup if this feature is enabled and the exception is not coming from the SDK itself
+			if (surpressExceptions && e.currentTarget.content != this)
+				e.preventDefault();
+
+			// send the exception information in form of an error event
+			if (e.currentTarget.content != null)
+			{
+				log("ERROR: Unhandled Exception in " + e.currentTarget.content + " | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message);
+				newErrorEvent("Unhandled Exception", "Content: " + e.currentTarget.content + " | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL, e.currentTarget.content.mouseX, e.currentTarget.content.mouseY);
+			}
+			else
+			{
+				log("ERROR: Unhandled Exception | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message);
+				newErrorEvent("Unhandled Exception", "ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL);
+			}
 		}
 	}
 }
