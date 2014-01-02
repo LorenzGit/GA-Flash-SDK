@@ -6,7 +6,7 @@ package com.gameanalytics.utils
 
 	public class GADeviceUtilMobile implements IGADeviceUtil
 	{
-		private var airDeviceId:AirDeviceId;
+		private var airDevice:AirDeviceId;
 		private var deviceId:String;
 
 		public function GADeviceUtilMobile()
@@ -16,15 +16,15 @@ package com.gameanalytics.utils
 
 		private function init():void
 		{
-			airDeviceId = AirDeviceId.getInstance();
+			airDevice = AirDeviceId.getInstance();
 
-			if (airDeviceId.isOnDevice)
+			if (airDevice.isOnDevice)
 			{
 				// get device ids if on device
-				if (airDeviceId.isOnAndroid)
-					deviceId = airDeviceId.getID("GameAnalytics");
+				if (airDevice.isOnAndroid)
+					deviceId = airDevice.getID("GameAnalytics");
 				else
-					deviceId = airDeviceId.getIDFA();
+					deviceId = airDevice.getIDFA();
 			}
 			else
 			{
@@ -60,16 +60,16 @@ package com.gameanalytics.utils
 		{
 			var obj:Object = {user_id: userId, session_id: sessionId, build: build};
 
-			if (airDeviceId.isOnDevice)
+			if (airDevice.isOnDevice)
 			{
 				// if on device, get device infos
 
-				if (airDeviceId.isOnAndroid)
+				if (airDevice.isOnAndroid)
 				{
 					obj.android_id = deviceId;
-					obj.platform = Capabilities.os;
-					obj.device = Capabilities.os;
-					obj.os_major = Capabilities.os;
+					obj.platform = "Android";
+					obj.device = "Android";
+					obj.os_major = "Android " + Capabilities.os;
 				}
 				else
 				{
@@ -93,7 +93,7 @@ package com.gameanalytics.utils
 			}
 			else
 			{
-				// If we are in simulator (not on device), send the system info
+				// If we are in a local simulator (not on device), send the system info
 				obj.platform = Capabilities.os;
 				obj.os_major = Capabilities.os
 			}
