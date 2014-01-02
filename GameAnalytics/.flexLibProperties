@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
-    <classEntry path="com.gameanalytics.constants.GASharedObjectConstants"/>
+    <classEntry path="com.adobe.crypto.MD5"/>
+    <classEntry path="com.adobe.utils.IntUtil"/>
+    <classEntry path="com.freshplanet.ane.AirDeviceId"/>
     <classEntry path="com.gameanalytics.GALogEvent"/>
+    <classEntry path="com.gameanalytics.GameAnalytics"/>
+    <classEntry path="com.gameanalytics.GameAnalyticsMobile"/>
+    <classEntry path="com.gameanalytics.constants.GAErrorSeverity"/>
+    <classEntry path="com.gameanalytics.constants.GAEventConstants"/>
+    <classEntry path="com.gameanalytics.constants.GASharedObjectConstants"/>
+    <classEntry path="com.gameanalytics.domain.GACore"/>
+    <classEntry path="com.gameanalytics.utils.GADeviceUtil"/>
+    <classEntry path="com.gameanalytics.utils.GADeviceUtilMobile"/>
+    <classEntry path="com.gameanalytics.utils.GAUniqueIdUtil"/>
+    <classEntry path="com.gameanalytics.utils.IGADeviceUtil"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

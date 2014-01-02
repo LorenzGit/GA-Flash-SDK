@@ -1,7 +1,6 @@
 package com.gameanalytics
 {
 	import com.gameanalytics.domain.GACore;
-	import com.gameanalytics.utils.GADeviceUtil;
 	import com.gameanalytics.utils.GADeviceUtilMobile;
 
 	import flash.display.LoaderInfo;
@@ -13,7 +12,6 @@ package com.gameanalytics
 
 		public function GameAnalyticsMobile():void
 		{
-
 		}
 
 		/**
