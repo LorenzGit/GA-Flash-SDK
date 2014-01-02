@@ -299,7 +299,8 @@
 		</InfoAdditions>
 		<requestedDisplayResolution>high</requestedDisplayResolution>
 	</iPhone>
-	<extensions>
-		<extensionID>com.freshplanet.ane.AirDeviceId</extensionID>
-	</extensions>
+	
+<extensions>
+        <extensionID>com.freshplanet.ane.AirDeviceId</extensionID>
+    </extensions>
 </application>
