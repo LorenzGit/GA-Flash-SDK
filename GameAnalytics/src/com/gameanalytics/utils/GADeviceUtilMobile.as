@@ -56,9 +56,9 @@ package com.gameanalytics.utils
 		/**
 		 * Builds the initial user event with device information
 		 */
-		public function createInitialUserObject(userId:String, sessionId:String, build:String):Object
+		public function createInitialUserObject(userId:String, sessionId:String, build:String, sdkVersion:String):Object
 		{
-			var obj:Object = {user_id: userId, session_id: sessionId, build: build};
+			var obj:Object = {user_id: userId, session_id: sessionId, build: build, sdk_version: sdkVersion};
 
 			if (airDevice.isOnDevice)
 			{

@@ -31,7 +31,7 @@ package com.gameanalytics.domain
 		// private
 		private const API_URL:String = "http://api.gameanalytics.com"; // The API base URL
 		private const API_VERSION:String = "1"; // API version
-		private const SDK_VERSION:String = "GA SDK FLASH 2.0.0"; // GameAnalytics SDK version
+		private const SDK_VERSION:String = "FLASHSDK 2.0.0"; // GameAnalytics SDK version
 		private const EVENT_LIMIT_PER_TYPE:int = 100; // if any type of events in the queue are over this limit, the SDK will drop the oldest events
 
 		private const DATA_SEND_INTERVAL:int = 5000; // Interval for sending data to server (in milliseconds)
@@ -130,7 +130,7 @@ package com.gameanalytics.domain
 			eventQueue = getEventsQueue();
 
 			// send initial user event with device information
-			addEventToQueue(GAEventConstants.USER, deviceIdUtil.createInitialUserObject(this.userId, this.sessionId, gameBuild));
+			addEventToQueue(GAEventConstants.USER, deviceIdUtil.createInitialUserObject(this.userId, this.sessionId, gameBuild, SDK_VERSION));
 
 			// send events from the local storage(if any) as well as the initial user event
 			sendData();
@@ -254,6 +254,8 @@ package com.gameanalytics.domain
 
 			if (isValidString(adTruthId))
 				object.adtruth_id = adTruthId;
+
+			object.sdk_version = SDK_VERSION;
 
 			addEventToQueue(GAEventConstants.USER, object);
 		}
