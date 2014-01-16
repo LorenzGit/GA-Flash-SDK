@@ -65,9 +65,9 @@ package com.gameanalytics.utils
 		/**
 		 * Builds the initial user event with device information
 		 */
-		public function createInitialUserObject(userId:String, sessionId:String, build:String):Object
+		public function createInitialUserObject(userId:String, sessionId:String, build:String, sdkVersion:String):Object
 		{
-			return {user_id: userId, session_id: sessionId, build: build, platform: Capabilities.os, os_major: Capabilities.os};
+			return {user_id: userId, session_id: sessionId, build: build, platform: Capabilities.os, os_major: Capabilities.os, sdk_version: sdkVersion};
 		}
 	}
 }
