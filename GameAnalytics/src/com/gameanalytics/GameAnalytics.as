@@ -87,17 +87,17 @@ package com.gameanalytics
 		/**
 		 * Creates a new design event and adds it to the event queue. Events are sent in batches every couple of seconds
 		 *
-		 * @param eventId:String - Your type of an event (for example, "Wrong username" or "Wrong password")
 		 * @param message:String - The message that is associated with this error
 		 * @param severity:String - Error severity. Please use the constants in the ErrorSeverity class - for example ErrorSeverity.CRITICAL
+		 * @param area:String (optional) - The event area (for example, "Level 1")
 		 * @param x:Number (optional) - The x coordinate of this event
 		 * @param y:Number (optional) - The y coordinate of this event
 		 * @param z:Number (optional) - The z coordinate of this event
 		 *
 		 */
-		public static function newErrorEvent(eventId:String, message:String, severity:String, x:Number = NaN, y:Number = NaN, z:Number = NaN):void
+		public static function newErrorEvent(message:String, severity:String, area:String = null, x:Number = NaN, y:Number = NaN, z:Number = NaN):void
 		{
-			core.newErrorEvent(eventId, message, severity, x, y, z);
+			core.newErrorEvent(message, severity, area, x, y, z);
 		}
 
 		/**
