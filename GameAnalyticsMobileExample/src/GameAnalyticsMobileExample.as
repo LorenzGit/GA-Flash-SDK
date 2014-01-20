@@ -145,7 +145,7 @@ package
 
 		private function onErrorEvent(e:MouseEvent):void
 		{
-			GameAnalyticsMobile.newErrorEvent("Test error", "This is a test for the error event", GAErrorSeverity.CRITICAL, 100, 100, 0);
+			GameAnalyticsMobile.newErrorEvent("This is a test for the error event", GAErrorSeverity.CRITICAL, "Level 1", 100, 100, 0);
 		}
 
 		private function onBusinessEvent(e:MouseEvent):void

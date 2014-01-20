@@ -261,20 +261,20 @@ package com.gameanalytics.domain
 		}
 
 		/**
-		 * Creates a new design event and adds it to the event queue. Events are sent in batches every couple of seconds
+		 * Creates a new error event and adds it to the event queue. Events are sent in batches every couple of seconds
 		 *
-		 * @param eventId:String - Your type of an event (for example, "Wrong username" or "Wrong password")
 		 * @param message:String - The message that is associated with this error
 		 * @param severity:String - Error severity. Please use the constants in the GAErrorSeverity class - for example GAErrorSeverity.CRITICAL
+		 * @param area:String (optional) - The event area (for example, "Level 1")
 		 * @param x:Number (optional) - The x coordinate of this event
 		 * @param y:Number (optional) - The y coordinate of this event
 		 * @param z:Number (optional) - The z coordinate of this event
 		 *
 		 */
-		public function newErrorEvent(eventId:String, message:String, severity:String, x:Number = NaN, y:Number = NaN, z:Number = NaN):void
+		public function newErrorEvent(message:String, severity:String, area:String = null, x:Number = NaN, y:Number = NaN, z:Number = NaN):void
 		{
 			if (severity == GAErrorSeverity.CRITICAL || severity == GAErrorSeverity.DEBUG || severity == GAErrorSeverity.ERROR || severity == GAErrorSeverity.INFO || severity == GAErrorSeverity.WARNING)
-				addEventToQueue(GAEventConstants.ERROR, addOptionalParameters({user_id: userId, session_id: sessionId, build: gameBuild, event_id: eventId, message: message, severity: severity}, null, x, y, z));
+				addEventToQueue(GAEventConstants.ERROR, addOptionalParameters({user_id: userId, session_id: sessionId, build: gameBuild, message: message, severity: severity}, area, x, y, z));
 			else
 				log("ERROR newErrorEvent: " + severity + " is not a valid error severity. Please use the GAErrorSeverity constants for the types - for example, GAErrorSeverity.ERROR. Current value will be replaced with GAErrorSeverity.ERROR");
 		}
