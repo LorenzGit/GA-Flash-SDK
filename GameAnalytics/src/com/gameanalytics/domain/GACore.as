@@ -724,12 +724,12 @@ package com.gameanalytics.domain
 			if (e.currentTarget.content != null)
 			{
 				log("ERROR: Unhandled Exception in " + e.currentTarget.content + " | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message);
-				newErrorEvent("Unhandled Exception", "Content: " + e.currentTarget.content + " | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL, e.currentTarget.content.mouseX, e.currentTarget.content.mouseY);
+				newErrorEvent("Content: " + e.currentTarget.content + " | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL, "Unhandled Exception", e.currentTarget.content.mouseX, e.currentTarget.content.mouseY);
 			}
 			else
 			{
 				log("ERROR: Unhandled Exception | ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message);
-				newErrorEvent("Unhandled Exception", "ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL);
+				newErrorEvent("ErrorId: " + e.error.errorID + " | Error name: " + e.error.name + " | Message: " + e.error.message, GAErrorSeverity.CRITICAL, "Unhandled Exception");
 			}
 		}
 	}
