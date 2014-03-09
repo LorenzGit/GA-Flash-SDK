@@ -34,7 +34,7 @@ package com.gameanalytics.domain
 		private const SDK_VERSION:String = "flash 2.0.0"; // GameAnalytics SDK version
 		private const EVENT_LIMIT_PER_TYPE:int = 100; // if any type of events in the queue are over this limit, the SDK will drop the oldest events
 
-		private const DATA_SEND_INTERVAL:int = 5000; // Interval for sending data to server (in milliseconds)
+		private const DATA_SEND_INTERVAL:int = 7000; // Interval for sending data to server (in milliseconds)
 
 		private var debugMode:Boolean;
 		private var initialized:Boolean;
@@ -147,6 +147,10 @@ package com.gameanalytics.domain
 		 */
 		public function sendData():void
 		{
+			// since we will send the data, let's reset the timer
+			if (dataSendTimer)
+				dataSendTimer.reset();
+
 			for (var key:String in eventQueue)
 			{
 				var array:Array = eventQueue[key];
@@ -493,6 +497,7 @@ package com.gameanalytics.domain
 			loader.data = type; // remember data type so we can clear the queue if the sending was successfull
 			loader.addEventListener(Event.COMPLETE, onRequestComplete);
 			loader.addEventListener(IOErrorEvent.IO_ERROR, onRequestError);
+			loader.addEventListener(IOErrorEvent.NETWORK_ERROR, onRequestError);
 			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onRequestSecurityError);
 			loader.addEventListener(HTTPStatusEvent.HTTP_STATUS, onRequestStatus);
 
@@ -620,6 +625,7 @@ package com.gameanalytics.domain
 		{
 			loader.removeEventListener(Event.COMPLETE, onRequestComplete);
 			loader.removeEventListener(IOErrorEvent.IO_ERROR, onRequestError);
+			loader.removeEventListener(IOErrorEvent.NETWORK_ERROR, onRequestError);
 			loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onRequestSecurityError);
 			loader.removeEventListener(HTTPStatusEvent.HTTP_STATUS, onRequestStatus);
 		}
@@ -643,6 +649,7 @@ package com.gameanalytics.domain
 		 */
 		private function onRequestComplete(event:Event):void
 		{
+			removeEventListenersFromLoader(event.currentTarget as URLLoader);
 		}
 
 		/**
@@ -708,7 +715,6 @@ package com.gameanalytics.domain
 			}
 
 			resetQueue(event.currentTarget.data);
-			removeEventListenersFromLoader(event.currentTarget as URLLoader);
 		}
 
 		/**

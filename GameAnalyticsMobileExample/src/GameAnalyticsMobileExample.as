@@ -91,11 +91,9 @@ package
 
 			addChild(scroller);
 
-			GameAnalyticsMobile.init(SECRET_KEY, GAME_KEY, GAME_VERSION);
+			GameAnalyticsMobile.init(SECRET_KEY, GAME_KEY, GAME_VERSION, null, null, true);
 			GameAnalyticsMobile.getLogEvents(onLogEvent);
 			GameAnalyticsMobile.DEBUG_MODE = true;
-
-			//GameAnalytics.deleteAllEvents();
 
 			showUserInfo();
 		}

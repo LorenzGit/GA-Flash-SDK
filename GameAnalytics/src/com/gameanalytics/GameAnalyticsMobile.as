@@ -2,6 +2,7 @@ package com.gameanalytics
 {
 	import com.gameanalytics.domain.GACore;
 	import com.gameanalytics.utils.GADeviceUtilMobile;
+	import com.gameanalytics.utils.IGADeviceUtil;
 
 	import flash.display.LoaderInfo;
 	import flash.events.EventDispatcher;
@@ -22,11 +23,13 @@ package com.gameanalytics
 		 * @param gameBuild:String - This is the current version of your game so you can spot problems along different release versions.
 		 * @param sessionId:String (optional) - You can specify a custom sessionId that should be unique and specific to one game session. If you leave it out, the SDK will create a sessionId for you.
 		 * @param userId:String (optional) - You can specify a custom userId that should be unique. If you leave it out, the SDK will create a userId for you.
-		 * @param deleteLocalStoredEvents:String (optional) - If there are any problems with previous events you have created, you can clear the local storage so the corrupted events won't be send at startup
+		 * @param useIDFVinsteadOfIDFA:Boolean (optional) - If you DO NOT use any ads in your application, you should set it to true. This will use the IDFV instead of IDFA as the device id
 		 */
-		public static function init(secretKey:String, gameKey:String, gameBuild:String, sessionId:String = null, userId:String = null):void
+		public static function init(secretKey:String, gameKey:String, gameBuild:String, sessionId:String = null, userId:String = null, useIDFVinsteadOfIDFA:Boolean = false):void
 		{
-			core = new GACore(new GADeviceUtilMobile());
+			var deviceUtil:IGADeviceUtil = new GADeviceUtilMobile(useIDFVinsteadOfIDFA);
+
+			core = new GACore(deviceUtil);
 			core.init(secretKey, gameKey, gameBuild, sessionId, userId);
 		}
 
