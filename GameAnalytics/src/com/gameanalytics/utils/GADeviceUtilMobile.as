@@ -9,8 +9,11 @@ package com.gameanalytics.utils
 		private var airDevice:AirDeviceId;
 		private var deviceId:String;
 
-		public function GADeviceUtilMobile()
+		private var useIDFVinsteadOfIDFA:Boolean;
+
+		public function GADeviceUtilMobile(useIDFVinsteadOfIDFA:Boolean)
 		{
+			this.useIDFVinsteadOfIDFA = useIDFVinsteadOfIDFA
 			init();
 		}
 
@@ -23,6 +26,8 @@ package com.gameanalytics.utils
 				// get device ids if on device
 				if (airDevice.isOnAndroid)
 					deviceId = airDevice.getID("GameAnalytics");
+				else if (useIDFVinsteadOfIDFA)
+					deviceId = airDevice.getIDFV();
 				else
 					deviceId = airDevice.getIDFA();
 			}
@@ -73,7 +78,9 @@ package com.gameanalytics.utils
 				}
 				else
 				{
-					obj.ios_id = deviceId;
+					if (!useIDFVinsteadOfIDFA)
+						obj.ios_id = deviceId;
+
 					obj.platform = "iPhone OS";
 
 					// Capabilities.os looks like "iPhone OS 7.0.3 iPad3,1"
