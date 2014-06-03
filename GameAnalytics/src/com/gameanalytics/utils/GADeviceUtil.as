@@ -24,7 +24,7 @@ package com.gameanalytics.utils
 			var obj:SharedObject = SharedObject.getLocal(GASharedObjectConstants.SHARED_OBJECT_ID);
 
 			// check if we have got something
-			if (obj && obj.data && obj.data.deviceId)
+			if (obj && obj.data && obj.data[GASharedObjectConstants.DEVICE_ID] != undefined)
 			{
 				deviceId = obj.data[GASharedObjectConstants.DEVICE_ID];
 			}
