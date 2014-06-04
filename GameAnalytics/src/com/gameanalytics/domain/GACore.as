@@ -149,7 +149,10 @@ package com.gameanalytics.domain
 		{
 			// since we will send the data, let's reset the timer
 			if (dataSendTimer)
+			{
 				dataSendTimer.reset();
+				dataSendTimer.start();
+			}
 
 			for (var key:String in eventQueue)
 			{
