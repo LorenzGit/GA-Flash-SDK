@@ -31,7 +31,7 @@ package com.gameanalytics.domain
 		// private
 		private const API_URL:String = "http://api.gameanalytics.com"; // The API base URL
 		private const API_VERSION:String = "1"; // API version
-		private const SDK_VERSION:String = "flash 2.0.0"; // GameAnalytics SDK version
+		private const SDK_VERSION:String = "flash 2.0.1"; // GameAnalytics SDK version
 		private const EVENT_LIMIT_PER_TYPE:int = 100; // if any type of events in the queue are over this limit, the SDK will drop the oldest events
 
 		private const DATA_SEND_INTERVAL:int = 7000; // Interval for sending data to server (in milliseconds)
@@ -213,7 +213,7 @@ package com.gameanalytics.domain
 		 * @param adTruthId:String (optional) - The AdTruth ID of the user, in clear.
 		 *
 		 */
-		public function newUserEvent(gender:String, birthYear:uint = NaN, friendCount:uint = NaN, facebookId:String = "", googlePlusId:String = "", installPublisher:String = "", installSite:String = "", installCampaign:String = "", installAdGroup:String = "", installAd:String = "", installKeyword:String = "", adTruthId:String = ""):void
+		public function newUserEvent(gender:String, birthYear:uint = 0, friendCount:uint = 0, facebookId:String = "", googlePlusId:String = "", installPublisher:String = "", installSite:String = "", installCampaign:String = "", installAdGroup:String = "", installAd:String = "", installKeyword:String = "", adTruthId:String = ""):void
 		{
 			var object:Object = {user_id: userId, session_id: sessionId, build: gameBuild};
 

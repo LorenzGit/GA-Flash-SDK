@@ -25,17 +25,23 @@ package com.gameanalytics.utils
 			{
 				// get device ids if on device
 				if (airDevice.isOnAndroid)
-					deviceId = airDevice.getID("GameAnalytics");
+					airDevice.getID("GameAnalytics", setDeviceId);
 				else if (useIDFVinsteadOfIDFA)
-					deviceId = airDevice.getIDFV();
+					airDevice.getIDFV( setDeviceId );
 				else
-					deviceId = airDevice.getIDFA();
+					airDevice.getIDFA( setDeviceId );
 			}
 			else
 			{
 				// create a unique id to test in the simulator
-				deviceId = GAUniqueIdUtil.createUnuqueId();
+				setDeviceId( GAUniqueIdUtil.createUnuqueId() );
 			}
+		}
+
+		//callback
+		private function setDeviceId(deviceId:String):void
+		{
+			this.deviceId = deviceId;
 		}
 
 		/**
