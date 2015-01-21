@@ -83,7 +83,7 @@ package com.gameanalytics
 		 * @param adTruthId:String (optional) - The AdTruth ID of the user, in clear.
 		 *
 		 */
-		public static function newUserEvent(gender:String, birthYear:uint = NaN, friendCount:uint = NaN, facebookId:String = "", googlePlusId:String = "", installPublisher:String = "", installSite:String = "", installCampaign:String = "", installAdGroup:String = "", installAd:String = "", installKeyword:String = "", adTruthId:String = ""):void
+		public static function newUserEvent(gender:String, birthYear:uint = 0, friendCount:uint = 0, facebookId:String = "", googlePlusId:String = "", installPublisher:String = "", installSite:String = "", installCampaign:String = "", installAdGroup:String = "", installAd:String = "", installKeyword:String = "", adTruthId:String = ""):void
 		{
 			core.newUserEvent(gender, birthYear, friendCount, facebookId, googlePlusId, installPublisher, installSite, installCampaign, installAdGroup, installAd, installKeyword, adTruthId);
 		}
@@ -230,4 +230,3 @@ package com.gameanalytics
 
 	}
 }
-
