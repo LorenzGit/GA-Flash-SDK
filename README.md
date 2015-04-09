@@ -9,3 +9,6 @@
 
 ##### v.2.0.1
 - Compatible with new version of DeviceId
+
+##### v.2.0.2
+- Added ability to override platform, deviceName and osVersion while setting up the mobile Analytics.

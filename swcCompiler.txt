@@ -1,0 +1,1 @@
+/Users/lnuvoletta/Desktop/AIRSDK_16/bin/compc -include-sources src/com -swf-version 23 -external-library-path /Users/lnuvoletta/Desktop/AIRSDK_16/frameworks/libs/air/airglobal.swc -output bin/GameAnalytics.swc

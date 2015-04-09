@@ -24,10 +24,13 @@ package com.gameanalytics
 		 * @param sessionId:String (optional) - You can specify a custom sessionId that should be unique and specific to one game session. If you leave it out, the SDK will create a sessionId for you.
 		 * @param userId:String (optional) - You can specify a custom userId that should be unique. If you leave it out, the SDK will create a userId for you.
 		 * @param useIDFVinsteadOfIDFA:Boolean (optional) - If you DO NOT use any ads in your application, you should set it to true. This will use the IDFV instead of IDFA as the device id
+		 * @param platform:String (optional) - Let's you set a custom platform for example (google, amazon, ios).
+		 * @param osVersion:String (optional) - Version of the os, let's you override the one used by Capabilities.
+		 * @param deviceName:String (optional) - Let's you set a custom device name.
 		 */
-		public static function init(secretKey:String, gameKey:String, gameBuild:String, sessionId:String = null, userId:String = null, useIDFVinsteadOfIDFA:Boolean = false):void
+		public static function init(secretKey:String, gameKey:String, gameBuild:String, sessionId:String = null, userId:String = null, useIDFVinsteadOfIDFA:Boolean = false, platform:String = null, osVersion:String = null, deviceName:String = null):void
 		{
-			var deviceUtil:IGADeviceUtil = new GADeviceUtilMobile(useIDFVinsteadOfIDFA);
+			var deviceUtil:IGADeviceUtil = new GADeviceUtilMobile(useIDFVinsteadOfIDFA, platform, osVersion, deviceName);
 
 			core = new GACore(deviceUtil);
 			core.init(secretKey, gameKey, gameBuild, sessionId, userId);

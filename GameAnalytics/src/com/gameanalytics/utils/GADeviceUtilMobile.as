@@ -8,12 +8,18 @@ package com.gameanalytics.utils
 	{
 		private var airDevice:AirDeviceId;
 		private var deviceId:String;
+		private var platform:String;
+		private var osVersion:String;
+		private var deviceName:String;
 
 		private var useIDFVinsteadOfIDFA:Boolean;
 
-		public function GADeviceUtilMobile(useIDFVinsteadOfIDFA:Boolean)
+		public function GADeviceUtilMobile(useIDFVinsteadOfIDFA:Boolean, platform:String, osVersion:String, deviceName:String)
 		{
-			this.useIDFVinsteadOfIDFA = useIDFVinsteadOfIDFA
+			this.useIDFVinsteadOfIDFA = useIDFVinsteadOfIDFA;
+			this.platform = platform;
+			this.osVersion = osVersion;
+			this.deviceName = deviceName;
 			init();
 		}
 
@@ -78,37 +84,40 @@ package com.gameanalytics.utils
 				if (airDevice.isOnAndroid)
 				{
 					obj.android_id = deviceId;
-					obj.platform = "Android";
-					obj.device = "Android";
-					obj.os_major = "Android " + Capabilities.os;
+					obj.platform = this.platform ? this.platform : "Android";
+					obj.device = this.deviceName ? this.deviceName : "Android";
+					obj.os_major = this.osVersion ? this.osVersion : "Android " + Capabilities.os;
 				}
 				else
 				{
 					if (!useIDFVinsteadOfIDFA)
 						obj.ios_id = deviceId;
 
-					obj.platform = "iPhone OS";
+					obj.platform = this.platform ? this.platform : "iPhone OS";
 
 					// Capabilities.os looks like "iPhone OS 7.0.3 iPad3,1"
 					// remove "iPhone OS " and we will get "7.0.3" and "iPad 3,1"
 					var osArray:Array = Capabilities.os.split("iPhone OS ").join("").split(" ");
 
 					// convert "iPad 3,1" to "iPad 3"
-					if (osArray.length > 0)
+					if (this.deviceName)
+						obj.device = this.deviceName;
+					else if (osArray.length > 0)
 						obj.device = osArray[1].split(",")[0];
 					else
 						obj.device = osArray[0];
 
 					// convert "7.0.3" to "7"
-					obj.os_major = osArray[0].split(".")[0];
+					obj.os_major = this.osVersion ? this.osVersion : osArray[0].split(".")[0];
 					obj.os_minor = osArray[0];
 				}
 			}
 			else
 			{
 				// If we are in a local simulator (not on device), send the system info
-				obj.platform = Capabilities.os;
-				obj.os_major = Capabilities.os
+				obj.platform = this.platform ? this.platform : Capabilities.os;
+				obj.device = this.deviceName ? this.deviceName : "Desktop";
+				obj.os_major = this.osVersion ? this.osVersion : Capabilities.os
 			}
 
 			return obj;

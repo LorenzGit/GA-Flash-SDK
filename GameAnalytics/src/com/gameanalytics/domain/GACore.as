@@ -31,7 +31,7 @@ package com.gameanalytics.domain
 		// private
 		private const API_URL:String = "http://api.gameanalytics.com"; // The API base URL
 		private const API_VERSION:String = "1"; // API version
-		private const SDK_VERSION:String = "flash 2.0.1"; // GameAnalytics SDK version
+		private const SDK_VERSION:String = "flash 2.0.2"; // GameAnalytics SDK version
 		private const EVENT_LIMIT_PER_TYPE:int = 100; // if any type of events in the queue are over this limit, the SDK will drop the oldest events
 
 		private const DATA_SEND_INTERVAL:int = 7000; // Interval for sending data to server (in milliseconds)
