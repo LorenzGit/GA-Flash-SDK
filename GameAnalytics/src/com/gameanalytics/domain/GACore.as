@@ -616,8 +616,13 @@ package com.gameanalytics.domain
 		{
 			if (sharedObject)
 			{
-				sharedObject.data[GASharedObjectConstants.SHARED_OBJECT_EVENTQUEUE] = array;
-				sharedObject.flush();
+				sharedObject.data[GASharedObjectConstants.SHARED_OBJECT_EVENTQUEUE] = array;				
+				try {
+					sharedObject.flush();
+				}
+				catch ( e:Error ) {
+					trace( e.toString() );
+				}
 			}
 		}
 
